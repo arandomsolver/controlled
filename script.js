@@ -399,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Attempt to sync to global leaderboard in background
         if (navigator.onLine) {
             try {
-                fetch('http://localhost:3000/leaderboard', {
+                fetch('https://jlep-backend.onrender.com/leaderboard', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -589,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (navigator.onLine) {
-                        fetch('http://localhost:3000/leaderboard/rename', {
+                        fetch('https://jlep-backend.onrender.com/leaderboard/rename', {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ oldName, newName, password })
@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(async () => {
                     addTerminalLine('Uplink established. Downloading global data...');
                     try {
-                        const res = await fetch('http://localhost:3000/leaderboard');
+                        const res = await fetch('https://jlep-backend.onrender.com/leaderboard');
                         if (!res.ok) throw new Error('Bad response');
                         const data = await res.json();
 
@@ -688,7 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
                     if (navigator.onLine) {
-                        fetch('http://localhost:3000/leaderboard', {
+                        fetch('https://jlep-backend.onrender.com/leaderboard', {
                             method: 'DELETE',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ name, password })
