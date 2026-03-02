@@ -21,14 +21,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioCtx = null;
     let musicStarted = false;
     let experienceStarted = false;
+    const BACKEND_URL = 'https://jlep-backend.onrender.com';
     let statusIdx = 0;
     const statuses = [
         "Initializing Logic...",
         "Decrypting Assets...",
         "Synchronizing Audio...",
         "Bypassing Firewalls...",
-        "JLEP: ACCESS GRANTED"
+        "CONTROLLED: ACCESS GRANTED"
     ];
+
+    // Data Migration: Port old JLEP data to Controlled
+    if (localStorage.getItem('jlep_solvers_data') && !localStorage.getItem('controlled_solvers_data')) {
+        localStorage.setItem('controlled_solvers_data', localStorage.getItem('jlep_solvers_data'));
+        localStorage.removeItem('jlep_solvers_data');
+        console.log("Migration: JLEP data ported to Controlled system.");
+    }
 
     function revealProject() {
         // Ensure we start at the top
@@ -349,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getStorage() {
         try {
-            const data = JSON.parse(localStorage.getItem('jlep_solvers_data'));
+            const data = JSON.parse(localStorage.getItem('controlled_solvers_data'));
             return data && typeof data === 'object' && Array.isArray(data.profiles) ? data : { active: null, profiles: [] };
         } catch { return { active: null, profiles: [] }; }
     }
@@ -368,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveStorage(data) {
-        localStorage.setItem('jlep_solvers_data', JSON.stringify(data));
+        localStorage.setItem('controlled_solvers_data', JSON.stringify(data));
         if (typeof updateNavProfile === 'function') updateNavProfile();
     }
 
@@ -399,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Attempt to sync to global leaderboard in background
         if (navigator.onLine) {
             try {
-                fetch('https://jlep-backend.onrender.com/leaderboard', {
+                fetch(`${BACKEND_URL}/leaderboard`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -427,8 +435,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Progress: <span class="cmd">progress</span> (view), <span class="cmd">progress reset &lt;pass&gt;</span>, <span class="cmd">progress reset all &lt;pass1&gt; &lt;pass2&gt; ...</span>'
             ),
             'log': () => {
-                addTerminalLine('[LOG 001] This puzzle was created by 4_r4nd0m_p14y3r. I dunno who is that, but the system created is good. — Feb 26, 2026');
-                addTerminalLine('[LOG 002] Threat levels were increasing, so security was improved. The owner created his own profile with encrypted password. (really?) — Mar 01, 2026');
+                addTerminalLine('[LOG 001] Someone named arandomsolver hacked into my computer and installed this program. Said that no one can escape unless they decrypt this so I tried to figure it out.  — Feb 26, 2026');
+                addTerminalLine('[LOG 002] I found out that the user added some security measures to the program by adding new passwords to all accounts. Mine was some kind of decrypted message. — Mar 01, 2026');
+                addTerminalLine('[LOG 003] The owner added a leaderboard and a progress tracker. I saw that lots of people got infected as well.— Mar 02, 2026');
             },
             'status': () => {
                 const solver = getSolverData();
@@ -439,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 addTerminalLine('Threat Level: <span class="cmd">MODERATE</span>');
             },
             'about': () => {
-                addTerminalLine('JLEP — Just Like Every Puzzle');
+                addTerminalLine('Controlled — Just Like Every Puzzle');
                 addTerminalLine('A browser-based riddle game inspired by Notpron.');
                 addTerminalLine('Created Feb 2026. Over 100 levels.');
             },
@@ -589,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (navigator.onLine) {
-                        fetch('https://jlep-backend.onrender.com/leaderboard/rename', {
+                        fetch(`${BACKEND_URL}/leaderboard/rename`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ oldName, newName, password })
@@ -631,7 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     addTerminalLine(`${i + 1}. <span class="cmd">${p.name}</span> — Max Level: ${maxCleared}`);
                 });
             } else if (sub === 'global') {
-                addTerminalLine('Checking connection to JLEP mainframes...');
+                addTerminalLine('Checking connection to Controlled mainframes...');
                 if (!navigator.onLine) {
                     setTimeout(() => addTerminalLine('<span class="cmd">ERROR:</span> No internet connection. Global leaderboard requires uplink.'), 500);
                     return;
@@ -639,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(async () => {
                     addTerminalLine('Uplink established. Downloading global data...');
                     try {
-                        const res = await fetch('https://jlep-backend.onrender.com/leaderboard');
+                        const res = await fetch(`${BACKEND_URL}/leaderboard`);
                         if (!res.ok) throw new Error('Bad response');
                         const data = await res.json();
 
@@ -688,7 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
                     if (navigator.onLine) {
-                        fetch('https://jlep-backend.onrender.com/leaderboard', {
+                        fetch(`${BACKEND_URL}/leaderboard`, {
                             method: 'DELETE',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ name, password })
@@ -734,7 +743,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isAll) {
                     const profiles = storage.profiles;
                     if (profiles.length === 0) {
-                        localStorage.removeItem('jlep_solvers_data');
+                        localStorage.removeItem('controlled_solvers_data');
                         if (typeof updateNavProfile === 'function') updateNavProfile();
                         addTerminalLine('No profiles found. System reset to default.');
                         return;
@@ -761,7 +770,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (allMatched) {
-                        localStorage.removeItem('jlep_solvers_data');
+                        localStorage.removeItem('controlled_solvers_data');
                         if (typeof updateNavProfile === 'function') updateNavProfile();
                         addTerminalLine('CRITICAL WIPE SUCCESSFUL. All solver profiles have been wiped from memory.');
                     } else {
@@ -804,7 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 addTerminalLine('<span class="cmd">ACCESS GRANTED.</span>');
                 addTerminalLine('You accessed a message sent by the admin.');
                 addTerminalLine('Nothing here yet.');
-                addTerminalLine('— JLEP System Administrator');
+                addTerminalLine('— Controlled System Administrator');
                 playSound(120, 'sine', 0.5, 0.03);
             } else {
                 addTerminalLine('<span class="cmd">ACCESS DENIED.</span> Invalid passcode.');

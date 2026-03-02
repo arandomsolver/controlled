@@ -1,11 +1,11 @@
 /**
- * JLEP Level Progress Tracker
+ * Controlled Level Progress Tracker
  * Include this script on any level page to track solver progress.
  * 
  * Usage:
  *   1. Add <script src="../assets-main/level-tracker.js"></script> to your level page.
- *   2. Call jlepSolveLevel(levelNumber) when the solver completes the level.
- *      Example: jlepSolveLevel(1) — marks level 1 as solved and sets current level to 2.
+ *   2. Call ctldSolveLevel(levelNumber) when the solver completes the level.
+ *      Example: ctldSolveLevel(1) — marks level 1 as solved and sets current level to 2.
  *   3. The solver's profile (registered via the terminal) is automatically updated.
  */
 
@@ -14,13 +14,13 @@
 
     function getStorage() {
         try {
-            const data = JSON.parse(localStorage.getItem('jlep_solvers_data'));
+            const data = JSON.parse(localStorage.getItem('controlled_solvers_data'));
             return data && typeof data === 'object' && Array.isArray(data.profiles) ? data : { active: null, profiles: [] };
         } catch { return { active: null, profiles: [] }; }
     }
 
     function saveStorage(data) {
-        localStorage.setItem('jlep_solvers_data', JSON.stringify(data));
+        localStorage.setItem('controlled_solvers_data', JSON.stringify(data));
     }
 
     function getSolverData() {
@@ -45,7 +45,7 @@
      * Mark a level as solved and advance the current level.
      * @param {number} levelNumber - The level that was just solved (e.g. 1, 2, 3...)
      */
-    window.jlepSolveLevel = function (levelNumber) {
+    window.ctldSolveLevel = function (levelNumber) {
         let solver = getSolverData();
 
         // If no solver registered, create a guest profile
@@ -69,7 +69,7 @@
 
         saveSolverData(solver);
 
-        console.log(`%cJLEP: Level ${levelNumber} solved!`, 'color: #ff3e3e; font-size: 14px; font-weight: bold;');
+        console.log(`%cControlled: Level ${levelNumber} solved!`, 'color: #ff3e3e; font-size: 14px; font-weight: bold;');
         console.log(`%cProgress saved. Current level: ${solver.level}`, 'color: #888; font-size: 12px;');
     };
 
@@ -77,7 +77,7 @@
      * Get the current solver's progress.
      * @returns {object|null} The solver data or null if not registered.
      */
-    window.jlepGetProgress = function () {
+    window.ctldGetProgress = function () {
         return getSolverData();
     };
 
@@ -86,7 +86,7 @@
      * Useful for tracking which level the solver is currently on.
      * @param {number} levelNumber - The level the solver is currently on.
      */
-    window.jlepSetCurrentLevel = function (levelNumber) {
+    window.ctldSetCurrentLevel = function (levelNumber) {
         let solver = getSolverData();
         if (!solver) {
             solver = {
@@ -100,4 +100,8 @@
         }
         saveSolverData(solver);
     };
+    // Backward Compatibility Aliases
+    window.jlepSolveLevel = window.ctldSolveLevel;
+    window.jlepGetProgress = window.ctldGetProgress;
+    window.jlepSetCurrentLevel = window.ctldSetCurrentLevel;
 })();
