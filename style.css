@@ -339,7 +339,7 @@ button,
     height: 100%;
     background:
         linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-        url('site-bg-ctld.png') center center fixed;
+        url('assets-main/site-bg-ctld.png') center center fixed;
     background-size: cover;
     opacity: 1;
     z-index: -20;
@@ -1285,6 +1285,15 @@ footer p {
     color: var(--accent-color);
 }
 
+.terminal-line.hint {
+    color: #00ffcc;
+    border-left: 2px solid #00ffcc;
+    padding-left: 12px;
+    margin: 8px 0;
+    font-style: italic;
+    text-shadow: 0 0 5px rgba(0, 255, 204, 0.3);
+}
+
 .terminal-line.user::before {
     content: '> ';
     color: var(--text-dim);
@@ -1463,9 +1472,6 @@ footer p {
 .terminal-open,
 .terminal-open body {
     overflow: hidden !important;
-    height: 100vh !important;
-    position: fixed;
-    width: 100%;
 }
 
 .terminal-hint {

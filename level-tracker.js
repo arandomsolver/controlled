@@ -12,6 +12,8 @@
 (function () {
     'use strict';
 
+    const BACKEND_URL = 'https://jlep-backend.onrender.com';
+
     function getStorage() {
         try {
             const data = JSON.parse(localStorage.getItem('controlled_solvers_data'));
@@ -31,6 +33,16 @@
 
     function saveSolverData(solverObj) {
         const storage = getStorage();
+
+        // Maintain persistent Max Level
+        const profileLevel = parseInt(solverObj.level) || 0;
+        const clearedMax = solverObj.cleared.length > 0 ? Math.max(...solverObj.cleared) : 0;
+        solverObj.highestLevel = Math.max(
+            (solverObj.highestLevel || 0),
+            profileLevel,
+            clearedMax
+        );
+
         const idx = storage.profiles.findIndex(p => p.name === solverObj.name);
         if (idx >= 0) {
             storage.profiles[idx] = solverObj;
@@ -39,6 +51,22 @@
         }
         storage.active = solverObj.name;
         saveStorage(storage);
+
+        // Background global sync
+        if (solverObj.name !== 'Guest') {
+            fetch(`${BACKEND_URL}/leaderboard`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: solverObj.name,
+                    level: solverObj.level,
+                    highestLevel: solverObj.highestLevel,
+                    cleared: solverObj.cleared,
+                    password: solverObj.password
+                }),
+                keepalive: true
+            }).catch(err => console.warn("Background sync failed:", err));
+        }
     }
 
     /**
@@ -64,8 +92,8 @@
             solver.cleared.sort((a, b) => a - b);
         }
 
-        // Update current level to the next one
-        solver.level = levelNumber + 1;
+        // Update current level if it's higher
+        solver.level = Math.max(parseInt(solver.level) || 1, levelNumber + 1);
 
         saveSolverData(solver);
 
@@ -96,7 +124,8 @@
                 registered: new Date().toLocaleDateString()
             };
         } else {
-            solver.level = levelNumber;
+            // Only update if higher
+            solver.level = Math.max(parseInt(solver.level) || 1, levelNumber);
         }
         saveSolverData(solver);
     };
